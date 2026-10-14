@@ -58,3 +58,4 @@ Prepara Java 17, ejecuta `mvn -B clean verify`, corre los casos del PDF y public
 resultados, reportes JUnit y cobertura en el artefacto `evidencia-simpson-5a`.
 En GitHub abre **Actions**, selecciona una ejecución y descarga su artefacto.
 
+Los cambios se realizan en develop y se integran a main mediante un pull request con las pruebas aprobadas.
