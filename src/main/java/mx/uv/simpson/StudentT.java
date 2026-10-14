@@ -1,19 +1,21 @@
 package mx.uv.simpson;
 
-/** Densidad t de Student para grados de libertad enteros de 1 a 10000. */
+/** Densidad t de Student para grados de libertad enteros de 1 a 342. */
 public final class StudentT {
     public static final double ERROR = 0.00001;
     private final int grados;
     private final double normalizacion;
 
     public StudentT(int grados) {
-        if (grados < 1 || grados > 10_000) {
-            throw new IllegalArgumentException("Los grados de libertad deben estar entre 1 y 10000");
+        if (grados < 1 || grados > 342) {
+            throw new IllegalArgumentException("Los grados de libertad deben estar entre 1 y 342");
         }
         this.grados = grados;
-        // Usamos logaritmos para evitar el desbordamiento de gamma
-        this.normalizacion = Math.exp(logGamma((grados + 1.0) / 2)
-                - logGamma(grados / 2.0) - 0.5 * Math.log(grados * Math.PI));
+        double gammaNumerador = gamma((grados + 1.0) / 2);
+        double gammaDenominador = gamma(grados / 2.0);
+        // Dividimos primero las Gamma para no desbordar el denominador.
+        this.normalizacion = (gammaNumerador / gammaDenominador)
+                / Math.sqrt(grados * Math.PI);
     }
 
     public double densidad(double x) {
@@ -35,15 +37,26 @@ public final class StudentT {
     }
 
     /** Recurrencia Gamma(z)=(z-1)Gamma(z-1), solo enteros y semienteros. */
-    static double logGamma(double z) {
-        if (!Double.isFinite(z) || z < 0.5 || z > 5000.5 || z * 2 != Math.rint(z * 2)) {
-            throw new IllegalArgumentException("Gamma requiere un entero o semientero entre 0.5 y 5000.5");
+    static double gamma(double numero) {
+        if (!Double.isFinite(numero) || numero <= 0
+                || numero * 2 != Math.floor(numero * 2)) {
+            throw new IllegalArgumentException("Se requiere un entero o semientero positivo");
         }
-        double suma = 0;
-        while (z > 1) {
-            z -= 1;
-            suma += Math.log(z);
+
+        double resultado = 1;
+        while (numero > 1) {
+            numero = numero - 1;
+            resultado = resultado * numero;
+
+            if (!Double.isFinite(resultado)) {
+                throw new ArithmeticException("Gamma es demasiado grande");
+            }
         }
-        return suma + (z == 0.5 ? 0.5 * Math.log(Math.PI) : 0);
+
+        if (numero == 0.5) {
+            resultado = resultado * Math.sqrt(Math.PI);
+        }
+
+        return resultado;
     }
 }
