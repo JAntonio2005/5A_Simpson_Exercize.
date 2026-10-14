@@ -8,14 +8,20 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.IntConsumer;
 
 public final class App {
     private App() { }
 
     public static void main(String[] args) {
-        int codigo = ejecutar(args, System.out, System.err);
+        iniciar(args, System.out, System.err, System::exit);
+    }
+
+    // Separa la decision de terminar del cierre real de la JVM para probarla.
+    static void iniciar(String[] args, PrintStream salida, PrintStream errores, IntConsumer terminar) {
+        int codigo = ejecutar(args, salida, errores);
         if (codigo != 0) {
-            System.exit(codigo);
+            terminar.accept(codigo);
         }
     }
 
