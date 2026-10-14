@@ -33,7 +33,7 @@ public final class App {
             List<String> entradas = new ArrayList<>();
             for (String arg : args) {
                 if (arg.equals("--help")) {
-                    salida.println("Uso: java -jar target/simpson-5a-1.0.0.jar [x dof ...] [--output=ruta]");
+                    salida.println("Instrucciones: java -jar target/simpson-5a-1.0.0.jar [x dof ...] [--output=ruta]");
                     return 0;
                 }
                 if (arg.startsWith("--output=")) {
