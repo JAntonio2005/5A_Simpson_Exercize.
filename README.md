@@ -51,15 +51,10 @@ Después de `mvn clean verify`:
 - Cobertura: abrir `target/site/jacoco/index.html`.
 - Programa: `target/simpson-5a-1.0.0.jar`.
 
-## GitHub Actions y trabajo desde el chat
+## GitHub Actions 
 
 El workflow `.github/workflows/ci.yml` se ejecuta en cada push, pull request o ejecución manual.
 Prepara Java 17, ejecuta `mvn -B clean verify`, corre los casos del PDF y publica el JAR,
 resultados, reportes JUnit y cobertura en el artefacto `evidencia-simpson-5a`.
 En GitHub abre **Actions**, selecciona una ejecución y descarga su artefacto.
-
-Este proyecto está asociado a `JAntonio2005/5A_Simpson_Exercize.`.
-El chat ya tiene conectado GitHub como `JAntonio2005`: puede revisar commits y consultar jobs y logs
-de Actions usando el enlace del repositorio o de una ejecución. La carpeta local conserva el remoto `origin`.
-Git registra y sube cambios; GitHub Actions ejecuta las comprobaciones después del push.
 
