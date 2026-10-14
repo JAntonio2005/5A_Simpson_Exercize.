@@ -45,6 +45,23 @@ JUnit comprueba estos valores con tolerancia absoluta 0.00001, polinomios con in
 refinamiento repetido, la integral analítica para dof=1 (`atan(x)/pi`), simetría, grados altos,
 validaciones y escritura del reporte.
 
+Las pruebas se organizan por clase, con **un assert por caso ejecutado**:
+
+| Archivo | Casos | Responsabilidad |
+|---|---:|---|
+| `SimpsonTest.java` | 27 | Integrales conocidas, segmentos, tolerancia, valores no finitos y limite de refinamiento |
+| `StudentTTest.java` | 34 | Casos del PDF, Gamma, integral de Cauchy, simetria y limites de entrada |
+| `AppTest.java` | 42 | Argumentos, reportes, ayuda, errores y codigos de salida del proceso |
+| **Total** | **103** | Cada entrada de una prueba parametrizada cuenta como un caso independiente |
+
+`mvn clean verify` exige **100 % de lineas, ramas e instrucciones** del codigo de produccion
+medidas por JaCoCo, sin excluir clases. Si baja cualquiera de estas medidas, Maven falla y
+el check obligatorio `verificar` del pull request bloquea el merge a `main`.
+Esto mide ejecucion de codigo; no garantiza ausencia de errores ni todas las combinaciones de entradas.
+
+`App.iniciar` permite probar la decision de cerrar el programa sin cerrar JUnit. Ademas,
+dos pruebas lanzan una JVM separada y verifican los codigos reales de salida de `main`.
+
 Después de `mvn clean verify`:
 
 - Pruebas: `target/surefire-reports/`.
