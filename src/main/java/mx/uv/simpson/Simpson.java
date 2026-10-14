@@ -2,7 +2,7 @@ package mx.uv.simpson;
 
 import java.util.function.DoubleUnaryOperator;
 
-/** Regla compuesta de Simpson con refinamiento por duplicacion. */
+
 public final class Simpson {
     private static final int MAX_SEGMENTOS = 1_310_720;
 

@@ -11,7 +11,7 @@ public final class StudentT {
             throw new IllegalArgumentException("Los grados de libertad deben estar entre 1 y 10000");
         }
         this.grados = grados;
-        // Usamos logaritmos para evitar el desbordamiento de Gamma.
+        // Usamos logaritmos para evitar el desbordamiento de gamma
         this.normalizacion = Math.exp(logGamma((grados + 1.0) / 2)
                 - logGamma(grados / 2.0) - 0.5 * Math.log(grados * Math.PI));
     }

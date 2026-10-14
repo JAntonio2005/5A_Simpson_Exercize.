@@ -5,8 +5,6 @@ No es la probabilidad acumulada desde menos infinito: para x >= 0, esa acumulada
 
 ## Ejecutar
 
-Requisitos: JDK 17 o superior y Maven 3.9.
-
 ```sh
 mvn clean verify
 java -jar target/simpson-5a-1.0.0.jar
@@ -65,12 +63,3 @@ El chat ya tiene conectado GitHub como `JAntonio2005`: puede revisar commits y c
 de Actions usando el enlace del repositorio o de una ejecución. La carpeta local conserva el remoto `origin`.
 Git registra y sube cambios; GitHub Actions ejecuta las comprobaciones después del push.
 
-## Alcance y referencias
-
-Se entrega programa, pruebas y CI según lo solicitado. No se incluyen formatos PSP2.
-Requisitos matemáticos: `5a.pdf`, Assignment Kit for Program 5, SEI/Carnegie Mellon, octubre 2006,
-páginas 3-10. El PDF permanece fuera del repositorio.
-Se revisó el ejemplo de Rafael (`RAFAELMH809/5a-simpson`) como referencia;
-esta implementación se preparó por separado con asistencia de Codex y debe revisarse y comprenderse antes de entregar.
-
-Configuración de CI contrastada con la [guía oficial de GitHub para Java y Maven](https://docs.github.com/en/actions/tutorials/build-and-test-code/java-with-maven).
