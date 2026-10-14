@@ -1,0 +1,36 @@
+name: Simpson 5A - pruebas y cobertura
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Preparar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Compilar, probar y medir cobertura
+        run: mvn -B clean verify
+      - name: Ejecutar los tres casos del PDF
+        run: java -jar target/simpson-5a-1.0.0.jar --output=target/resultados.txt
+      - name: Guardar evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencia-simpson-5a
+          if-no-files-found: error
+          path: |
+            target/surefire-reports/
+            target/site/jacoco/
+            target/resultados.txt
+            target/*.jar
