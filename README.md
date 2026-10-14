@@ -18,7 +18,8 @@ java -jar target/simpson-5a-1.0.0.jar 1.1 9 1.1812 10 2.750 30 --output=resultad
 java -jar target/simpson-5a-1.0.0.jar 1 1
 ```
 
-Los grados de libertad admitidos son enteros de 1 a 10000; x debe ser finito y no negativo.
+Los grados de libertad admitidos son enteros de 1 a 342; x debe ser finito y no negativo.
+Con 343 grados, la formula necesita Gamma(172), que ya desborda un `double`.
 La carpeta de salida debe existir. Un error de entrada, escritura o convergencia termina con código 1.
 
 ## Cómo funciona
@@ -26,7 +27,11 @@ La carpeta de salida debe existir. Un error de entrada, escritura o convergencia
 1. `StudentT` calcula la densidad:
    `f(t) = Gamma((v+1)/2) / (sqrt(v*pi)*Gamma(v/2)) * (1+t²/v)^(-(v+1)/2)`.
 2. Gamma usa `Gamma(z)=(z-1)*Gamma(z-1)`, `Gamma(1)=1` y `Gamma(1/2)=sqrt(pi)`.
-   Se acumulan logaritmos para evitar desbordamiento de los factoriales; el factor de normalización se calcula una sola vez.
+   La funcion `gamma` multiplica los factores con un ciclo y usa los dos casos base.
+   Por ejemplo, Gamma(5) = 4 * 3 * 2 * 1 = 24 y Gamma(2.5) = 1.5 * 0.5 * sqrt(pi).
+   Si una multiplicacion desborda, informa un error. Para normalizar, primero divide
+   Gamma((v+1)/2) entre Gamma(v/2) y luego entre sqrt(v*pi), evitando desbordar
+   el producto del denominador. El factor se calcula una sola vez.
 3. `Simpson.integrar` usa `h/3 * [f(a) + 4*f(a+h) + 2*f(a+2h) + ... + f(b)]`.
 4. `Simpson.refinar` empieza con 10 segmentos, duplica a 20, 40, etc. y devuelve el último resultado cuando
    `abs(p_actual-p_anterior) < 0.00001`. Como pide el ejercicio, este es un criterio entre aproximaciones,
@@ -50,9 +55,9 @@ Las pruebas se organizan por clase, con **un assert por caso ejecutado**:
 | Archivo | Casos | Responsabilidad |
 |---|---:|---|
 | `SimpsonTest.java` | 27 | Integrales conocidas, segmentos, tolerancia, valores no finitos y limite de refinamiento |
-| `StudentTTest.java` | 34 | Casos del PDF, Gamma, integral de Cauchy, simetria y limites de entrada |
+| `StudentTTest.java` | 41 | Casos del PDF, Gamma directa y desbordamiento, integrales analiticas, simetria y limites de entrada |
 | `AppTest.java` | 42 | Argumentos, reportes, ayuda, errores y codigos de salida del proceso |
-| **Total** | **103** | Cada entrada de una prueba parametrizada cuenta como un caso independiente |
+| **Total** | **110** | Cada entrada de una prueba parametrizada cuenta como un caso independiente |
 
 `mvn clean verify` exige **100 % de lineas, ramas e instrucciones** del codigo de produccion
 medidas por JaCoCo, sin excluir clases. Si baja cualquiera de estas medidas, Maven falla y

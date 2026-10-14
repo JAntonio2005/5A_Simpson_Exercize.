@@ -19,18 +19,31 @@ class StudentTTest {
     @ParameterizedTest(name = "Gamma({0})")
     @MethodSource("valoresGammaConocidos")
     void calculaGamma(double z, double esperado) {
-        assertEquals(esperado, Math.exp(StudentT.logGamma(z)), 1e-12);
+        assertEquals(esperado, StudentT.gamma(z), 1e-12);
     }
 
     static Stream<Arguments> valoresGammaConocidos() {
         return Stream.of(Arguments.of(1, 1), Arguments.of(0.5, Math.sqrt(Math.PI)),
-                Arguments.of(5, 24), Arguments.of(4.5, 105 * Math.sqrt(Math.PI) / 16));
+                Arguments.of(5, 24), Arguments.of(4.5, 105 * Math.sqrt(Math.PI) / 16),
+                Arguments.of(2.5, 0.75 * Math.sqrt(Math.PI)));
     }
 
     @ParameterizedTest(name = "Gamma rechaza {0}")
-    @ValueSource(doubles = {Double.NaN, Double.POSITIVE_INFINITY, 0.25, 5001, 0.75})
+    @ValueSource(doubles = {Double.NaN, Double.POSITIVE_INFINITY, 0, -1, 0.25, 0.75})
     void rechazaArgumentoGammaInvalido(double z) {
-        assertThrows(IllegalArgumentException.class, () -> StudentT.logGamma(z));
+        assertThrows(IllegalArgumentException.class, () -> StudentT.gamma(z));
+    }
+
+    @ParameterizedTest(name = "Gamma detecta desbordamiento para {0}")
+    @ValueSource(doubles = {172, 172.5})
+    void rechazaGammaQueDesborda(double numero) {
+        assertThrows(ArithmeticException.class, () -> StudentT.gamma(numero));
+    }
+
+    @ParameterizedTest(name = "Gamma grande aun representable: {0}")
+    @CsvSource({"171,7.257415615307998e306", "171.5,9.483367566824801e307"})
+    void calculaGammaGrandeSinDesbordar(double numero, double esperado) {
+        assertEquals(1, StudentT.gamma(numero) / esperado, 1e-14);
     }
 
     @ParameterizedTest(name = "Integral analitica Cauchy hasta {0}")
@@ -51,23 +64,29 @@ class StudentTTest {
     }
 
     @Test
-    void milGradosConservanDensidadConocidaSinDesbordamientoGamma() {
-        assertEquals(0.3988425573, new StudentT(1000).densidad(0), 1e-9);
+    void densidadConDosGradosTieneValorConocidoEnCero() {
+        assertEquals(1 / (2 * Math.sqrt(2)), new StudentT(2).densidad(0), 1e-12);
     }
 
     @Test
-    void probabilidadConMilGradosSeAcercaALaNormal() {
-        assertEquals(0.34122379096, new StudentT(1000).probabilidad(1).valor(), 1e-5);
+    void probabilidadConDosGradosCoincideConIntegralAnalitica() {
+        // Para dof=2, la integral de 0 a x es x/(2*sqrt(x*x+2)).
+        assertEquals(1 / (2 * Math.sqrt(3)), new StudentT(2).probabilidad(1).valor(), 1e-5);
     }
 
     @Test
     void aceptaLimiteSuperiorDeGrados() {
-        assertEquals(0.39893230697, new StudentT(10000).densidad(0), 1e-9);
+        assertEquals(0.39865076290461415, new StudentT(342).densidad(0), 1e-12);
+    }
+
+    @Test
+    void aceptaGradosImparesCercaDelLimite() {
+        assertTrue(Double.isFinite(new StudentT(341).densidad(0)));
     }
 
     @Test
     void densidadEnExtremoFinitoTiendeACero() {
-        assertEquals(0, new StudentT(1000).densidad(Double.MAX_VALUE));
+        assertEquals(0, new StudentT(342).densidad(Double.MAX_VALUE));
     }
 
     @Test
@@ -76,7 +95,7 @@ class StudentTTest {
     }
 
     @ParameterizedTest(name = "Rechaza dof={0}")
-    @ValueSource(ints = {0, -1, 10001})
+    @ValueSource(ints = {0, -1, 343})
     void rechazaGradosFueraDelDominio(int grados) {
         assertThrows(IllegalArgumentException.class, () -> new StudentT(grados));
     }
