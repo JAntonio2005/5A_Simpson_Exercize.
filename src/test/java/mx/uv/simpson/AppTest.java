@@ -119,7 +119,7 @@ class AppTest {
 
     @Test
     void ayudaExplicaElUso() {
-        assertTrue(ejecutar("--help").salida().contains("Uso:"));
+        assertTrue(ejecutar("--help").salida().contains("Instrucciones:"));
     }
 
     @Test
