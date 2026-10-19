@@ -19,7 +19,7 @@ public final class Main {
         if (codigo != 0) {
             terminar.accept(codigo);
         }
-    }
+    }}
 
     private record Caso(double x, int grados, Double esperado) { }
 
