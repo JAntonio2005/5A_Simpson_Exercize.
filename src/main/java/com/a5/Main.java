@@ -13,16 +13,16 @@ public final class Main {
     private Main() { }
 
     public static void main(String[] args) {
-        iniciar(args, System.out, System.err, System::exit);
-    }
+    iniciar(args, System.out, System.err, System::exit);
+}
 
-    // Separa la decision de terminar del cierre real de la JVM para probarla.
-    static void iniciar(String[] args, PrintStream salida, PrintStream errores, IntConsumer terminar) {
-        int codigo = ejecutar(args, salida, errores);
-        if (codigo != 0) {
-            terminar.accept(codigo);
-        }
+static void iniciar(String[] args, PrintStream salida,
+                    PrintStream errores, IntConsumer terminar) {
+    int codigo = ejecutar(args, salida, errores);
+    if (codigo != 0) {
+        terminar.accept(codigo);
     }
+}
 
     private record Caso(double x, int grados, Double esperado) { }
 

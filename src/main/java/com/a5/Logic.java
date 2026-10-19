@@ -1,6 +1,4 @@
 package com.a5;
-
-/** Coordina la distribucion t de Student y la integracion con Simpson. */
 public final class Logic {
     private Logic() { }
 

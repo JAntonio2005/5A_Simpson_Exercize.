@@ -1,8 +1,6 @@
 package com.a5;
 
 import java.util.function.DoubleUnaryOperator;
-
-/** Regla compuesta de Simpson y refinamiento por duplicacion de segmentos. */
 public final class SimpsonIntegration {
     private SimpsonIntegration() { }
 
