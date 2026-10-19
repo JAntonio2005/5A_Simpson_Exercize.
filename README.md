@@ -24,19 +24,45 @@ La carpeta de salida debe existir. Un error de entrada, escritura o convergencia
 
 ## Cómo funciona
 
-1. `StudentT` calcula la densidad:
+1. `StudentDerivation` calcula la densidad:
    `f(t) = Gamma((v+1)/2) / (sqrt(v*pi)*Gamma(v/2)) * (1+t²/v)^(-(v+1)/2)`.
-2. Gamma usa `Gamma(z)=(z-1)*Gamma(z-1)`, `Gamma(1)=1` y `Gamma(1/2)=sqrt(pi)`.
-   La funcion `gamma` multiplica los factores con un ciclo y usa los dos casos base.
+2. `Gamma.calcular` usa `Gamma(z)=(z-1)*Gamma(z-1)`, `Gamma(1)=1` y `Gamma(1/2)=sqrt(pi)`.
+   Multiplica los factores con un ciclo y usa los dos casos base.
    Por ejemplo, Gamma(5) = 4 * 3 * 2 * 1 = 24 y Gamma(2.5) = 1.5 * 0.5 * sqrt(pi).
    Si una multiplicacion desborda, informa un error. Para normalizar, primero divide
    Gamma((v+1)/2) entre Gamma(v/2) y luego entre sqrt(v*pi), evitando desbordar
    el producto del denominador. El factor se calcula una sola vez.
-3. `Simpson.integrar` usa `h/3 * [f(a) + 4*f(a+h) + 2*f(a+2h) + ... + f(b)]`.
-4. `Simpson.refinar` empieza con 10 segmentos, duplica a 20, 40, etc. y devuelve el último resultado cuando
+3. `SimpsonIntegration.integrar` usa `h/3 * [f(a) + 4*f(a+h) + 2*f(a+2h) + ... + f(b)]`.
+4. `SimpsonIntegration.refinar` empieza con 10 segmentos, duplica a 20, 40, etc. y devuelve el último resultado cuando
    `abs(p_actual-p_anterior) < 0.00001`. Como pide el ejercicio, este es un criterio entre aproximaciones,
    no una garantía matemática del error real para cualquier función o intervalo. El límite de seguridad es 1310720 segmentos.
-5. `App` interpreta la entrada y guarda valor, segmentos y diferencia final.
+5. `Logic.calcular` coordina la distribucion y Simpson. `Main` interpreta la entrada
+   y crea el reporte. `reuse.OutFile` lo escribe en disco. `Constant` centraliza tolerancia y limites.
+
+## Estructura
+
+```text
+src/
+  main/
+    java/com/a5/
+      reuse/
+        OutFile.java
+      Constant.java
+      Gamma.java
+      Logic.java
+      Main.java
+      SimpsonIntegration.java
+      StudentDerivation.java
+    resources/
+  test/java/com/a5/
+    Testfile.java
+```
+
+Se utiliza el nombre `StudentDerivation` para coincidir con la estructura solicitada;
+esta clase calcula la densidad t, no una derivada matematica.
+`reuse.OutFile` se reutiliza de `helloworld/programa3a/src/main/java/centenoProgram3/OutFile.java`:
+conserva ambos metodos `escribir`, con cambio de paquete y comentario de procedencia.
+La escritura de resultados mantiene UTF-8, que es la codificacion predeterminada de `Files.writeString`.
 
 ## Pruebas y resultados esperados
 
@@ -50,21 +76,24 @@ JUnit comprueba estos valores con tolerancia absoluta 0.00001, polinomios con in
 refinamiento repetido, la integral analítica para dof=1 (`atan(x)/pi`), simetría, grados altos,
 validaciones y escritura del reporte.
 
-Las pruebas se organizan por clase, con **un assert por caso ejecutado**:
+Todas las pruebas se encuentran en `src/test/java/com/a5/Testfile.java`,
+con **un assert por caso ejecutado**. Conservan los 110 casos anteriores y agregan
+dos pruebas de las sobrecargas del archivo reutilizado:
 
-| Archivo | Casos | Responsabilidad |
+| Grupo dentro de Testfile | Casos | Responsabilidad |
 |---|---:|---|
-| `SimpsonTest.java` | 27 | Integrales conocidas, segmentos, tolerancia, valores no finitos y limite de refinamiento |
-| `StudentTTest.java` | 41 | Casos del PDF, Gamma directa y desbordamiento, integrales analiticas, simetria y limites de entrada |
-| `AppTest.java` | 42 | Argumentos, reportes, ayuda, errores y codigos de salida del proceso |
-| **Total** | **110** | Cada entrada de una prueba parametrizada cuenta como un caso independiente |
+| SimpsonIntegration | 27 | Integrales conocidas, segmentos, tolerancia, valores no finitos y limite de refinamiento |
+| Gamma, StudentDerivation y Logic | 41 | Casos del PDF, Gamma directa y desbordamiento, integrales analiticas, simetria y limites de entrada |
+| Main | 42 | Argumentos, reportes, ayuda, errores y codigos de salida del proceso |
+| reuse.OutFile | 2 | Escritura con ruta String y Path |
+| **Total** | **112** | Cada entrada de una prueba parametrizada cuenta como un caso independiente |
 
 `mvn clean verify` exige **100 % de lineas, ramas e instrucciones** del codigo de produccion
 medidas por JaCoCo, sin excluir clases. Si baja cualquiera de estas medidas, Maven falla y
 el check obligatorio `verificar` del pull request bloquea el merge a `main`.
 Esto mide ejecucion de codigo; no garantiza ausencia de errores ni todas las combinaciones de entradas.
 
-`App.iniciar` permite probar la decision de cerrar el programa sin cerrar JUnit. Ademas,
+`Main.iniciar` permite probar la decision de cerrar el programa sin cerrar JUnit. Ademas,
 dos pruebas lanzan una JVM separada y verifican los codigos reales de salida de `main`.
 
 Después de `mvn clean verify`:
@@ -79,5 +108,7 @@ El workflow `.github/workflows/ci.yml` se ejecuta en cada push, pull request o e
 Prepara Java 17, ejecuta `mvn -B clean verify`, corre los casos del PDF y publica el JAR,
 resultados, reportes JUnit y cobertura en el artefacto `evidencia-simpson-5a`.
 En GitHub abre **Actions**, selecciona una ejecución y descarga su artefacto.
+
+El manifiesto del JAR utiliza `com.a5.Main`. El comando `java -jar` es el mismo.
 
 Los cambios se realizan en develop y se integran a main mediante un pull request con las pruebas aprobadas.

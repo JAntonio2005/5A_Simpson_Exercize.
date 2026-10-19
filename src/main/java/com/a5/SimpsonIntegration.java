@@ -1,12 +1,10 @@
-package mx.uv.simpson;
+package com.a5;
 
 import java.util.function.DoubleUnaryOperator;
 
-
-public final class Simpson {
-    private static final int MAX_SEGMENTOS = 1_310_720;
-
-    private Simpson() { }
+/** Regla compuesta de Simpson y refinamiento por duplicacion de segmentos. */
+public final class SimpsonIntegration {
+    private SimpsonIntegration() { }
 
     public record Resultado(double valor, int segmentos, double diferencia) { }
 
@@ -14,8 +12,8 @@ public final class Simpson {
         if (funcion == null || !Double.isFinite(a) || !Double.isFinite(b) || b < a) {
             throw new IllegalArgumentException("Funcion o intervalo no valido");
         }
-        if (n <= 0 || n % 2 != 0 || n > MAX_SEGMENTOS) {
-            throw new IllegalArgumentException("Los segmentos deben ser pares entre 2 y " + MAX_SEGMENTOS);
+        if (n <= 0 || n % 2 != 0 || n > Constant.MAX_SEGMENTOS) {
+            throw new IllegalArgumentException("Los segmentos deben ser pares entre 2 y " + Constant.MAX_SEGMENTOS);
         }
         if (a == b) {
             return 0;
@@ -36,9 +34,9 @@ public final class Simpson {
         if (!Double.isFinite(error) || error <= 0) {
             throw new IllegalArgumentException("El error debe ser positivo y finito");
         }
-        int n = 10;
+        int n = Constant.SEGMENTOS_INICIALES;
         double anterior = integrar(funcion, a, b, n);
-        while (n < MAX_SEGMENTOS) {
+        while (n < Constant.MAX_SEGMENTOS) {
             n *= 2;
             double actual = integrar(funcion, a, b, n);
             double diferencia = Math.abs(actual - anterior);
