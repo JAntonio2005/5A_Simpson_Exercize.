@@ -1,17 +1,16 @@
-package mx.uv.simpson;
+package com.a5;
 
+import com.a5.reuse.OutFile;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.IntConsumer;
 
-public final class App {
-    private App() { }
+public final class Main {
+    private Main() { }
 
     public static void main(String[] args) {
         iniciar(args, System.out, System.err, System::exit);
@@ -61,14 +60,14 @@ public final class App {
             }
             StringBuilder reporte = new StringBuilder("Ejercicio 5A: integral t de Student de 0 a x\n");
             for (Caso caso : casos) {
-                Simpson.Resultado r = new StudentT(caso.grados()).probabilidad(caso.x());
+                SimpsonIntegration.Resultado r = Logic.calcular(caso.x(), caso.grados());
                 String esperado = caso.esperado() == null ? "N/A"
                         : String.format(Locale.ROOT, "%.5f", caso.esperado());
                 reporte.append(String.format(Locale.ROOT,
                         "x=%.4f dof=%d esperado=%s p=%.8f segmentos=%d diferencia=%.3e%n",
                         caso.x(), caso.grados(), esperado, r.valor(), r.segmentos(), r.diferencia()));
             }
-            Files.writeString(archivo, reporte, StandardCharsets.UTF_8);
+            new OutFile().escribir(archivo, reporte.toString());
             salida.print(reporte);
             salida.println("Reporte guardado en: " + archivo);
             return 0;
