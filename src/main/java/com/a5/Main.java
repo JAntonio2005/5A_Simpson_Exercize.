@@ -50,7 +50,7 @@ static void iniciar(String[] args, PrintStream salida,
             }
             List<Caso> casos = new ArrayList<>();
             if (entradas.isEmpty()) {
-                casos.addAll(List.of(new Caso(1.1, 9, 0.1000),
+                casos.addAll(List.of(new Caso(1.1, 9, 0.35006),
                         new Caso(1.1812, 10, 0.36757), new Caso(2.750, 30, 0.49500)));
             } else {
                 for (int i = 0; i < entradas.size(); i += 2) {
